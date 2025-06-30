@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discrete Mathematics in Cryptography: Securing the Digital World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(to bottom, #f3f4f6, #ffffff); 
+            position: relative; 
+            margin: 0; 
+            padding: 0; 
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="%23e5e7eb" stroke-width="0.5" opacity="0.1"%3E%3Cpath d="M0 50h100M50 0v100M25 0v100M75 0v100M0 25h100M0 75h100"/%3E%3C/svg%3E');
+            z-index: -1;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #2dd4bf);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .math-inline { display: inline; }
+        .section-container { max-width: 1200px; margin: auto; padding: 2rem; }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+            margin-bottom: 2rem; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        }
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
+        }
+        .interactive-demo { 
+            border: 1px solid #e5e7eb; 
+            padding: 1.5rem; 
+            border-radius: 12px; 
+            background: #f9fafb; 
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02); 
+        }
+        .step { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+            border-left: 5px solid #1e3a8a; 
+            transition: all 0.3s ease; 
+        }
+        .step:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08); 
+        }
+        .step h2 { 
+            color: #1e3a8a; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            margin-bottom: 1rem; 
+        }
+        .input-group { margin: 1rem 0; }
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+            color: #4b5563; 
+        }
+        input[type="text"], input[type="number"], input[type="file"] { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 2px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
+        input[type="text"]:focus, input[type="number"]:focus, input[type="file"]:focus { 
+            outline: none; 
+            border-color: #2dd4bf; 
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2); 
+        }
+        button { 
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6); 
+            color: white; 
+            border: none; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            margin: 0.5rem; 
+        }
+        button:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 6px 15px rgba(30, 58, 138, 0.3); 
+        }
+        button:disabled { 
+            background: #d1d5db; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+        .result { 
+            background: #f9fafb; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 8px; 
+            padding: 1rem; 
+            margin: 1rem 0; 
+            font-family: 'Courier New', monospace; 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+            animation: fadeIn 0.5s ease; 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        .math-step { 
+            background: #eff6ff; 
+            border-left: 4px solid #3b82f6; 
+            padding: 1rem; 
+            margin: 1rem 0; 
+            border-radius: 0 8px 8px 0; 
+        }
+        .success { 
+            background: #ecfdf5; 
+            border-left: 4px solid #10b981; 
+            color: #065f46; 
+        }
+        .warning { 
+            background: #fefce8; 
+            border: 1px solid #f59e0b; 
+            color: #854d0e; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin: 1rem 0; 
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+            margin: 1.5rem 0; 
+        }
+        .progress-bar { 
+            background: #d1d5db; 
+            height: 8px; 
+            border-radius: 4px; 
+            margin: 1.5rem 0; 
+            overflow: hidden; 
+        }
+        .progress-fill { 
+            background: linear-gradient(45deg, #2dd4bf, #14b8a6); 
+            height: 100%; 
+            width: 0%; 
+            transition: width 0.5s ease; 
+        }
+        .char-encoding, .pixel-encoding { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 0.75rem; 
+            margin: 1rem 0; 
+        }
+        .char-box, .pixel-box { 
+            background: #1e3a8a; 
+            color: white; 
+            padding: 0.5rem 1rem; 
+            border-radius: 6px; 
+            font-family: 'Courier New', monospace; 
+            text-align: center; 
+            min-width: 60px; 
+            animation: fadeInUp 0.5s ease; 
+        }
+        .canvas-container {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .canvas-label {
+            font-weight: 600;
+            color: #4b5563;
+        }
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @media (max-width: 768px) { 
+            .grid { grid-template-columns: 1fr; } 
+            .section-container { padding: 1rem; } 
+            header h1 { font-size: 1.75rem; } 
+            header { padding: 1rem 0; } 
+        }
+        #introduction h2,
+        #text-encryption h2,
+        #image-encryption h2,
+        #video-encryption h2,
+        #conclusion h2 {
+            background: linear-gradient(135deg, #1e3a8a, #2dd4bf);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.875rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-gradient-to-r from-blue-900 to-teal-400 text-white py-12 shadow-lg" aria-label="Page header">
+        <div class="section-container text-center">
+            <h1 class="text-5xl font-bold tracking-wide uppercase">Discrete Mathematics in Cryptography</h1>
+        </div>
+    </header>
+
+    <main class="math-container">
+        <!-- Introduction -->
+        <section id="introduction" class="my-12 card">
+            <h2>Introduction</h2>
+            <p class="mt-4 text-gray-700 leading-relaxed">
+                Cryptography transforms sensitive data—text messages, color images, or video streams—into secure, unreadable forms using the power of discrete mathematics. From military intelligence to everyday communication, algorithms like RSA and AES rely on prime numbers, modular arithmetic, Euler’s theorem, and finite fields to ensure privacy and authenticity. This blog explores how these mathematical principles secure our digital world in an accessible yet rigorous way.
+            </p>
+        </section>
+
+        <!-- Text Encryption -->
+        <section id="text-encryption" class="my-12 card">
+            <h2>Text Encryption with RSA</h2>
+            <p class="mt-4 text-gray-700 leading-relaxed">
+                Text encryption converts readable messages into secure ciphertext. RSA, a cornerstone of public-key cryptography, leverages number theory to achieve robust security.
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">From Text to Numbers</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Each character is mapped to an integer using ASCII (e.g., ‘A’ → 65, ‘a’ → 97, space → 32). To handle multiple characters, we group them into a single integer using base-256 encoding:
+                \[
+                M = c_1 \cdot 256^{k-1} + c_2 \cdot 256^{k-2} + \dots + c_k \cdot 256^0
+                \]
+                where \( c_i \) is the ASCII code of the \( i \)-th character, and \( M < n \), the RSA modulus.
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">RSA Mechanics</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                RSA relies on modular arithmetic. Key generation involves:
+            </p>
+            <ol class="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Choose two large primes \( p \) and \( q \).</li>
+                <li>Compute \( n = p \cdot q \) and Euler’s totient \( \varphi(n) = (p-1)(q-1) \).</li>
+                <li>Select a public exponent \( e \) where \( 1 < e < \varphi(n) \) and \( \gcd(e, \varphi(n)) = 1 \).</li>
+                <li>Compute the private key \( d \) such that \( e \cdot d \equiv 1 \pmod{\varphi(n)} \).</li>
+            </ol>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Encryption transforms the message \( M \) into ciphertext:
+                \[
+                C = M^e \mod n
+                \]
+                Decryption recovers the message:
+                \[
+                M = C^d \mod n
+                \]
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Why It Works</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Euler’s theorem ensures correctness: if \( \gcd(M, n) = 1 \), then \( M^{\varphi(n)} \equiv 1 \pmod{n} \). Since \( e \cdot d \equiv 1 \pmod{\varphi(n)} \), we have:
+                \[
+                (M^e)^d = M^{ed} = M^{1 + k \varphi(n)} = M \cdot (M^{\varphi(n)})^k \equiv M \cdot 1^k \equiv M \pmod{n}
+                \]
+                For cases where \( \gcd(M, n) \neq 1 \), the Chinese Remainder Theorem guarantees recovery.
+            </p>
+        </section>
+
+        <!-- RSA Text Encryption Simulator -->
+        <section id="simulator" class="my-12 card">
+            <h2 class="text-3xl font-semibold text-blue-900">RSA Step-by-Step Simulator</h2>
+            <div class="interactive-demo">
+                <p class="text-gray-700 leading-relaxed">Enter a message to encrypt it step-by-step using RSA. Default primes are \( p=61 \), \( q=53 \), \( n=3233 \), with \( e=17 \), \( d=413 \). Adjust primes or block size as needed.</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <!-- Step 1: Text Input -->
+                <div class="step" id="step1">
+                    <h2>Step 1: Enter Your Message</h2>
+                    <div class="input-group">
+                        <label for="messageInput">Message to encrypt:</label>
+                        <input type="text" id="messageInput" placeholder="Hello World!" value="Hi!" aria-label="Message to encrypt">
+                    </div>
+                    <button onclick="processMessage()" aria-label="Process message">Process Message</button>
+                    <div id="charEncodingResult"></div>
+                </div>
+
+                <!-- Step 2: Key Generation -->
+                <div class="step" id="step2">
+                    <h2>Step 2: RSA Key Generation</h2>
+                    <div class="grid">
+                        <div>
+                            <label for="primeP">Prime p:</label>
+                            <input type="number" id="primeP" value="61" min="3" max="1000" aria-label="Prime number p">
+                        </div>
+                        <div>
+                            <label for="primeQ">Prime q:</label>
+                            <input type="number" id="primeQ" value="53" min="3" max="1000" aria-label="Prime number q">
+                        </div>
+                    </div>
+                    <button onclick="generateKeys()" aria-label="Generate RSA keys">Generate Keys</button>
+                    <div id="keyGenerationResult"></div>
+                </div>
+
+                <!-- Step 3: Block Formation -->
+                <div class="step" id="step3">
+                    <h2>Step 3: Block Formation</h2>
+                    <div class="input-group">
+                        <label for="blockSize">Characters per block (k):</label>
+                        <input type="number" id="blockSize" value="2" min="1" max="4" aria-label="Characters per block">
+                    </div>
+                    <button onclick="formBlocks()" aria-label="Form message blocks">Form Blocks</button>
+                    <div id="blockResult"></div>
+                </div>
+
+                <!-- Step 4: Encryption -->
+                <div class="step" id="step4">
+                    <h2>Step 4: Encryption</h2>
+                    <button onclick="encryptMessage()" aria-label="Encrypt blocks">Encrypt Blocks</button>
+                    <div id="encryptionResult"></div>
+                </div>
+
+                <!-- Step 5: Decryption -->
+                <div class="step" id="step5">
+                    <h2>Step 5: Decryption</h2>
+                    <button onclick="decryptMessage()" aria-label="Decrypt blocks">Decrypt Back to Text</button>
+                    <div id="decryptionResult"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Encryption -->
+        <section id="image-encryption" class="my-12 card">
+            <h2>Image Encryption with RSA</h2>
+            <p class="mt-4 text-gray-700 leading-relaxed">
+                Imagine sending a top-secret satellite image or a drone reconnaissance photo across the internet. To keep it safe from prying eyes, we use RSA encryption, powered by the magic of discrete mathematics. Whether it's military intelligence or personal photos, RSA transforms colorful pixels into unreadable ciphertext using prime numbers, modular arithmetic, and some clever number theory. Let’s dive into how we encrypt a color image step-by-step, making it both secure and fascinating!
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Turning Pixels into Numbers</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                A color image is like a giant grid of pixels, each with three values: Red, Green, and Blue (RGB), ranging from 0 to 255. For a pixel at position \( (i,j) \), we have:
+                \[
+                R_{i,j}, G_{i,j}, B_{i,j} \in \{0, 1, \dots, 255\}
+                \]
+                To encrypt this pixel, we pack its RGB values into a single number using a base-256 system (since each color is an 8-bit value):
+                \[
+                M = R \cdot 256^2 + G \cdot 256 + B
+                \]
+                For example, a pixel with \( (R=100, G=150, B=200) \) becomes:
+                \[
+                M = 100 \cdot 65536 + 150 \cdot 256 + 200 = 6,553,600 + 38,400 + 200 = 6,592,200
+                \]
+                This number \( M \) must be smaller than the RSA modulus \( n \). For efficiency, we can group multiple pixels into a larger block:
+                \[
+                M = \sum_{t=1}^{k} p_t \cdot 256^{3(k-t)}
+                \]
+                where \( p_t \) is the RGB data of one pixel, and we ensure \( 256^{3k} < n \).
+            </p>
+            <div class="math-step">
+                <strong>Why Base-256?</strong> Each RGB value fits perfectly into a byte (8 bits = 256 possibilities), making base-256 a natural choice for encoding pixel data.
+            </div>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Setting Up RSA: The Key to Security</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                RSA encryption starts with generating a public and private key pair, rooted in number theory:
+            </p>
+            <ol class="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Pick two large prime numbers, \( p \) and \( q \).</li>
+                <li>Multiply them to get the modulus: \( n = p \cdot q \).</li>
+                <li>Calculate Euler’s totient: \( \varphi(n) = (p-1)(q-1) \).</li>
+                <li>Choose a public exponent \( e \) such that \( 1 < e < \varphi(n) \) and \( \gcd(e, \varphi(n)) = 1 \).</li>
+                <li>Find the private key \( d \), the modular inverse of \( e \), so \( e \cdot d \equiv 1 \pmod{\varphi(n)} \).</li>
+            </ol>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                The public key is \( (n, e) \), and the private key is \( d \).
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Adding Randomness with OAEP Padding</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Direct RSA encryption is predictable, so we use <strong>OAEP (Optimal Asymmetric Encryption Padding)</strong> for security:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li>Take the pixel number \( M \) and a random seed \( r \).</li>
+                <li>Mask the message: \( \text{maskedMsg} = M \oplus G(r) \), where \( G \) is a hash function and \( \oplus \) is XOR.</li>
+                <li>Mask the seed: \( \text{maskedSeed} = r \oplus H(\text{maskedMsg}) \), where \( H \) is another hash function.</li>
+                <li>Combine them: \( M' = \text{maskedMsg} \,||\, \text{maskedSeed} \).</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                This ensures semantic security, making the ciphertext appear random.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Encrypting the Pixel Data</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                With the padded number \( M' \), encryption is:
+                \[
+                C = (M')^e \mod n
+                \]
+                This uses modular exponentiation, computed efficiently with the square-and-multiply algorithm.
+            </p>
+            <div class="math-step">
+                <strong>Encryption Formula:</strong> \( C = (M')^e \mod n \)
+            </div>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Decrypting with Euler’s Theorem</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Decryption uses the private key \( d \):
+                \[
+                M' = C^d \mod n
+                \]
+                Euler’s theorem ensures \( (M')^{ed} \equiv M' \pmod{n} \). After unpadding \( M' \), we recover \( M \).
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Speeding Up with the Chinese Remainder Theorem</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                To speed up decryption:
+            </p>
+            <ol class="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Compute \( d_p = d \mod (p-1) \) and \( d_q = d \mod (q-1) \).</li>
+                <li>Calculate partial decryptions: \( m_p = C^{d_p} \mod p \) and \( m_q = C^{d_q} \mod q \).</li>
+                <li>Combine: \( M' = m_q + q \cdot (q^{-1} (m_p - m_q) \mod p) \).</li>
+            </ol>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Rebuilding the Image</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Unpack \( M \) into RGB values:
+                \[
+                R = \left\lfloor \frac{M}{256^2} \right\rfloor, \quad G = \left\lfloor \frac{M}{256} \right\rfloor \mod 256, \quad B = M \mod 256
+                \]
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Try It Yourself: RSA Image Encryption Simulator</h3>
+            <div class="interactive-demo">
+                <p class="text-gray-700 leading-relaxed">Upload an image (PNG/JPEG) to encrypt and decrypt its pixels using RSA. Use default primes p=65537, q=65539 for larger images. <strong>Note: Large images may take a long time to process.</strong></p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="imageProgressFill"></div>
+                </div>
+
+                <div class="step" id="imageStep1">
+                    <h2>Step 1: Upload Your Image</h2>
+                    <div class="input-group">
+                        <label for="imageInput">Select Image (PNG/JPEG):</label>
+                        <input type="file" id="imageInput" accept="image/png,image/jpeg" aria-label="Upload image">
+                    </div>
+                    <button onclick="processImage()" aria-label="Process image">Process Image</button>
+                    <div id="imageDisplay" class="canvas-container"></div>
+                    <div id="pixelEncodingResult"></div>
+                </div>
+
+                <div class="step" id="imageStep2">
+                    <h2>Step 2: RSA Key Generation</h2>
+                    <div class="grid">
+                        <div>
+                            <label for="imagePrimeP">Prime p:</label>
+                            <input type="number" id="imagePrimeP" value="65537" min="3" max="1000000" aria-label="Prime number p">
+                        </div>
+                        <div>
+                            <label for="imagePrimeQ">Prime q:</label>
+                            <input type="number" id="imagePrimeQ" value="65539" min="3" max="1000000" aria-label="Prime number q">
+                        </div>
+                    </div>
+                    <button onclick="generateImageKeys()" aria-label="Generate RSA keys for image">Generate Keys</button>
+                    <div id="imageKeyGenerationResult"></div>
+                </div>
+
+                <div class="step" id="imageStep3">
+                    <h2>Step 3: Simplified OAEP Padding</h2>
+                    <div class="input-group">
+                        <label for="seedInput">Random Seed (0–255):</label>
+                        <input type="number" id="seedInput" value="42" min="0" max="255" aria-label="Random seed">
+                    </div>
+                    <button onclick="padImage()" aria-label="Apply padding">Apply Padding</button>
+                    <div id="paddingResult"></div>
+                </div>
+
+                <div class="step" id="imageStep4">
+                    <h2>Step 4: Encryption</h2>
+                    <button onclick="encryptImage()" aria-label="Encrypt image">Encrypt Image</button>
+                    <div id="imageEncryptionResult"></div>
+                </div>
+
+                <div class="step" id="imageStep5">
+                    <h2>Step 5: Decryption and Verification</h2>
+                    <button onclick="decryptImage()" aria-label="Decrypt image">Decrypt and Verify</button>
+                    <div id="imageDecryptionResult"></div>
+                    <div id="decryptedImageDisplay" class="canvas-container"></div>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Real-World Impact</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                From military drone footage to secure medical imaging, RSA encryption protects sensitive images in high-stakes scenarios. By combining pixel packing, modular arithmetic, Euler’s theorem, and CRT, we create a robust system grounded in discrete mathematics.
+            </p>
+        </section>
+
+        <!-- Video Encryption -->
+        <section id="video-encryption" class="my-12 card">
+            <h2>Video Encryption with RSA and AES</h2>
+            <p class="mt-4 text-gray-700 leading-relaxed">
+                Videos, as sequences of image frames, are critical in applications like military intelligence, surveillance, and secure communications. Encrypting video streams ensures privacy and authenticity, relying on a hybrid approach combining RSA for secure key exchange and AES for efficient frame encryption.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">What Is a Video Mathematically?</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                A video is a sequence of image frames, represented as:
+                \[
+                \text{Video} = \{F_1, F_2, \dots, F_n\}
+                \]
+                Each frame \( F_i \) is a grid of pixels, with dimensions \( H \times W \), where each pixel has three 8-bit RGB values.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Encoding Pixel Blocks into Integers</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Pixel values are converted into integers using base-256 encoding, similar to image encryption.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">RSA: Secure Key Exchange</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                RSA securely transmits the AES key, using the same key generation process as described earlier.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">AES: Fast Frame Encryption in Finite Fields</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                AES encrypts each frame efficiently in \( \mathbb{F}_{2^8} \), processing 16-byte blocks through rounds of SubBytes, ShiftRows, MixColumns, and AddRoundKey.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Digital Signatures for Frame Authentication</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Digital signatures ensure frame authenticity using hash functions and RSA signing.
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Hash Chaining for Stream Integrity</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Hash chaining prevents frame reordering or tampering:
+                \[
+                H_0 = \text{Hash}(F_0), \quad H_1 = \text{Hash}(F_1 \parallel H_0), \dots
+                \]
+            </p>
+
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Military Applications</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                These techniques secure drone surveillance, satellite imagery, and body camera footage.
+            </p>
+        </section>
+
+        <!-- Conclusion -->
+        <section id="conclusion" class="my-12 card">
+            <h2>Conclusion</h2>
+            <p class="mt-4 text-gray-700 leading-relaxed">
+                Discrete mathematics underpins modern cryptography, with RSA relying on prime factorization and Euler’s theorem, while AES leverages finite fields. This blog illustrates these principles through interactive examples.
+            </p>
+            <p class="mt-4 text-gray-600 text-sm">
+                 © All rights reserved.
+            </p>
+        </section>
+    </main>
+
+    <script>
+        // Shared utility functions
+        function modPow(base, exp, mod) {
+            base = BigInt(base);
+            exp = BigInt(exp);
+            mod = BigInt(mod);
+            let result = 1n;
+            base = base % mod;
+            while (exp > 0n) {
+                if (exp & 1n) result = (result * base) % mod;
+                base = (base * base) % mod;
+                exp >>= 1n;
+            }
+            return result;
+        }
+
+        function isPrime(num) {
+            num = Number(num);
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function gcd(a, b) {
+            a = Number(a);
+            b = Number(b);
+            while (b !== 0) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+
+        function modInverse(e, phi) {
+            e = Number(e);
+            phi = Number(phi);
+            let [old_r, r] = [e, phi];
+            let [old_s, s] = [1, 0];
+            while (r !== 0) {
+                let quotient = Math.floor(old_r / r);
+                [old_r, r] = [r, old_r - quotient * r];
+                [old_s, s] = [s, old_s - quotient * s];
+            }
+            return old_s < 0 ? old_s + phi : old_s;
+        }
+
+        // Text Encryption Simulator
+        let globalState = {
+            message: '',
+            charCodes: [],
+            p: 61,
+            q: 53,
+            n: 0,
+            phi: 0,
+            e: 17,
+            d: 0,
+            blocks: [],
+            encryptedBlocks: [],
+            blockSize: 2
+        };
+
+        function updateProgress(step) {
+            const progress = (step / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function processMessage() {
+            const message = document.getElementById('messageInput').value;
+            if (!message) {
+                alert('Please enter a message!');
+                return;
+            }
+
+            globalState.message = message;
+            globalState.charCodes = [];
+            let resultHTML = '<h3>Character Encoding (ASCII):</h3>';
+            resultHTML += '<div class="char-encoding">';
+            for (let i = 0; i < message.length; i++) {
+                const char = message[i];
+                const code = char.charCodeAt(0);
+                globalState.charCodes.push(code);
+                resultHTML += `<div class="char-box">'${char}' → ${code}</div>`;
+            }
+            resultHTML += '</div>';
+            resultHTML += `<div class="result">ASCII codes: [${globalState.charCodes.join(', ')}]</div>`;
+            document.getElementById('charEncodingResult').innerHTML = resultHTML;
+            updateProgress(1);
+        }
+
+        function generateKeys() {
+            const p = parseInt(document.getElementById('primeP').value);
+            const q = parseInt(document.getElementById('primeQ').value);
+            if (!isPrime(p) || !isPrime(q)) {
+                alert('Both p and q must be prime numbers!');
+                return;
+            }
+            if (p === q) {
+                alert('p and q must be different primes!');
+                return;
+            }
+
+            globalState.p = p;
+            globalState.q = q;
+            globalState.n = p * q;
+            globalState.phi = (p - 1) * (q - 1);
+            let e = 3;
+            while (e < globalState.phi && gcd(e, globalState.phi) !== 1) {
+                e += 2;
+            }
+            globalState.e = e;
+            globalState.d = modInverse(e, globalState.phi);
+
+            let resultHTML = '<div class="math-step">';
+            resultHTML += `<strong>Key Generation Steps:</strong><br>`;
+            resultHTML += `1. Choose primes: p = ${p}, q = ${q}<br>`;
+            resultHTML += `2. Calculate n = p × q = ${p} × ${q} = ${globalState.n}<br>`;
+            resultHTML += `3. Calculate φ(n) = (p-1)(q-1) = ${p-1} × ${q-1} = ${globalState.phi}<br>`;
+            resultHTML += `4. Choose e = ${e} (gcd(${e}, ${globalState.phi}) = 1)<br>`;
+            resultHTML += `5. Calculate d ≡ e⁻¹ (mod φ(n)): d = ${globalState.d}<br>`;
+            resultHTML += `6. Verify: e × d = ${e} × ${globalState.d} = ${e * globalState.d} ≡ 1 (mod ${globalState.phi})<br>`;
+            resultHTML += '</div>';
+            resultHTML += `<div class="result success">`;
+            resultHTML += `<strong>🔑 Generated Keys:</strong><br>`;
+            resultHTML += `Public Key: (n=${globalState.n}, e=${globalState.e})<br>`;
+            resultHTML += `Private Key: d=${globalState.d}`;
+            resultHTML += `</div>`;
+            document.getElementById('keyGenerationResult').innerHTML = resultHTML;
+            updateProgress(2);
+        }
+
+        function formBlocks() {
+            if (globalState.charCodes.length === 0) {
+                alert('Please process a message first!');
+                return;
+            }
+            const k = parseInt(document.getElementById('blockSize').value);
+            globalState.blockSize = k;
+            globalState.blocks = [];
+            let resultHTML = '<h3>Block Formation:</h3>';
+            resultHTML += `<div class="math-step">Formula: M = c₁×256^(k-1) + c₂×256^(k-2) + ... + cₖ×256⁰</div>`;
+            for (let i = 0; i < globalState.charCodes.length; i += k) {
+                let blockChars = globalState.charCodes.slice(i, i + k);
+                let M = 0n;
+                let calculation = '';
+                for (let j = 0; j < blockChars.length; j++) {
+                    const power = blockChars.length - 1 - j;
+                    const term = BigInt(blockChars[j]) * (256n ** BigInt(power));
+                    M += term;
+                    if (j > 0) calculation += ' + ';
+                    calculation += `${blockChars[j]}×256^${power}`;
+                }
+                if (M >= BigInt(globalState.n)) {
+                    resultHTML += `<div class="warning">⚠️ Block ${M} ≥ n (${globalState.n}). Try smaller block size or different primes!</div>`;
+                    document.getElementById('blockResult').innerHTML = resultHTML;
+                    return;
+                }
+                globalState.blocks.push(Number(M));
+                resultHTML += `<div class="result">`;
+                resultHTML += `Block ${Math.floor(i/k) + 1}: [${blockChars.join(', ')}] → ${calculation} = ${M}<br>`;
+                resultHTML += `</div>`;
+            }
+            document.getElementById('blockResult').innerHTML = resultHTML;
+            updateProgress(3);
+        }
+
+        function encryptMessage() {
+            if (globalState.blocks.length === 0) {
+                alert('Please form blocks first!');
+                return;
+            }
+            globalState.encryptedBlocks = [];
+            let resultHTML = '<h3>Encrypting Each Block:</h3>';
+            resultHTML += `<div class="math-step">Encryption: C = M^e mod n = M^${globalState.e} mod ${globalState.n}</div>`;
+            for (let i = 0; i < globalState.blocks.length; i++) {
+                const M = globalState.blocks[i];
+                const C = modPow(M, globalState.e, globalState.n);
+                globalState.encryptedBlocks.push(Number(C));
+                resultHTML += `<div class="result">`;
+                resultHTML += `Block ${i + 1}: ${M}^${globalState.e} mod ${globalState.n} = ${C}<br>`;
+                resultHTML += `</div>`;
+            }
+            resultHTML += `<div class="result success">`;
+            resultHTML += `<strong>🔒 Encrypted Message:</strong><br>`;
+            resultHTML += `[${globalState.encryptedBlocks.join(', ')}]`;
+            resultHTML += `</div>`;
+            document.getElementById('encryptionResult').innerHTML = resultHTML;
+            updateProgress(4);
+        }
+
+        function decryptMessage() {
+            if (globalState.encryptedBlocks.length === 0) {
+                alert('Please encrypt the blocks first!');
+                return;
+            }
+            let resultHTML = '<h3>Decrypting Each Block:</h3>';
+            resultHTML += `<div class="math-step">Decryption: M = C^d mod n = C^${globalState.d} mod ${globalState.n}</div>`;
+            let decryptedBlocks = [];
+            for (let i = 0; i < globalState.encryptedBlocks.length; i++) {
+                const C = globalState.encryptedBlocks[i];
+                const M = modPow(C, globalState.d, globalState.n);
+                decryptedBlocks.push(Number(M));
+                resultHTML += `<div class="result">`;
+                resultHTML += `Block ${i + 1}: ${C}^${globalState.d} mod ${globalState.n} = ${M}<br>`;
+                resultHTML += `</div>`;
+            }
+            let decryptedText = '';
+            for (let i = 0; i < decryptedBlocks.length; i++) {
+                let blockValue = decryptedBlocks[i];
+                let chars = '';
+                for (let j = globalState.blockSize - 1; j >= 0; j--) {
+                    let charCode = blockValue % 256;
+                    chars = String.fromCharCode(charCode) + chars;
+                    blockValue = Math.floor(blockValue / 256);
+                }
+                decryptedText += chars;
+            }
+            resultHTML += `<div class="result success">`;
+            resultHTML += `<strong>🔓 Decrypted Message:</strong><br>`;
+            resultHTML += `${decryptedText}`;
+            resultHTML += `</div>`;
+            document.getElementById('decryptionResult').innerHTML = resultHTML;
+            updateProgress(5);
+        }
+
+        // Image Encryption Simulator
+        let imageState = {
+            originalImage: null,
+            pixels: [],
+            pixelValues: [],
+            p: 65537,
+            q: 65539,
+            n: 0,
+            phi: 0,
+            e: 17,
+            d: 0,
+            seed: 0,
+            paddedValues: [],
+            ciphertexts: [],
+            decryptedPixels: [],
+            width: 0,
+            height: 0
+        };
+
+        function updateImageProgress(step) {
+            const progress = (step / 5) * 100;
+            document.getElementById('imageProgressFill').style.width = progress + '%';
+        }
+
+        function processBatch(array, processFn, resultContainer, completionFn, batchSize = 50) {
+            let index = 0;
+            const total = array.length;
+            resultContainer.innerHTML = `<div class="result">Processing ${total} pixels... <span id="progressText">0%</span></div>`;
+            const progressText = document.getElementById('progressText');
+
+            function processNextBatch() {
+                const end = Math.min(index + batchSize, total);
+                try {
+                    for (let i = index; i < end; i++) {
+                        processFn(i);
+                    }
+                    index = end;
+                    const progress = Math.round((index / total) * 100);
+                    if (progressText) {
+                        progressText.textContent = `${progress}%`;
+                    }
+                    if (index < total) {
+                        setTimeout(processNextBatch, 0);
+                    } else {
+                        completionFn();
+                    }
+                } catch (e) {
+                    resultContainer.innerHTML = `<div class="result warning">⚠️ Error: ${e.message}. Try a smaller image or larger primes (e.g., p=65537, q=65539).</div>`;
+                }
+            }
+            processNextBatch();
+        }
+
+        function processImage() {
+            const input = document.getElementById('imageInput');
+            if (!input.files[0]) {
+                document.getElementById('pixelEncodingResult').innerHTML = `<div class="result warning">⚠️ Please upload an image!</div>`;
+                return;
+            }
+            const file = input.files[0];
+            if (!file.type.startsWith('image/png') && !file.type.startsWith('image/jpeg')) {
+                document.getElementById('pixelEncodingResult').innerHTML = `<div class="result warning">⚠️ Please upload a PNG or JPEG image!</div>`;
+                return;
+            }
+            const img = new Image();
+            img.onload = function() {
+                const display = document.getElementById('imageDisplay');
+                display.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                imageState.width = img.width;
+                imageState.height = img.height;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                canvas.style.width = Math.min(img.width, 100) + 'px';
+                canvas.style.height = Math.min(img.height, 100) + 'px';
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                imageState.originalImage = ctx.getImageData(0, 0, img.width, img.height);
+                imageState.pixels = [];
+                imageState.pixelValues = [];
+                const totalPixels = img.width * img.height;
+                let resultHTML = '<h3>Pixel Encoding (Base-256):</h3>';
+                resultHTML += `<div class="math-step">Formula: M = R*256^2 + G*256 + B</div>`;
+                resultHTML += '<div class="pixel-encoding">';
+                const displayLimit = Math.min(10, totalPixels);
+                for (let i = 0; i < img.height; i++) {
+                    for (let j = 0; j < img.width; j++) {
+                        const idx = (i * img.width + j) * 4;
+                        const r = imageState.originalImage.data[idx];
+                        const g = imageState.originalImage.data[idx + 1];
+                        const b = imageState.originalImage.data[idx + 2];
+                        const M = r * 65536 + g * 256 + b;
+                        imageState.pixels.push([r, g, b]);
+                        imageState.pixelValues.push(M);
+                        if (i * img.width + j < displayLimit) {
+                            resultHTML += `<div class="pixel-box">Pixel (${i},${j}): R=${r}, G=${g}, B=${b} → M=${M}</div>`;
+                        }
+                    }
+                }
+                if (totalPixels > displayLimit) {
+                    resultHTML += `<div class="result">... Showing first ${displayLimit} of ${totalPixels} pixels</div>`;
+                }
+                resultHTML += '</div>';
+                document.getElementById('pixelEncodingResult').innerHTML = resultHTML;
+                display.innerHTML = '<span class="canvas-label">Uploaded Image:</span>';
+                display.appendChild(canvas);
+                updateImageProgress(1);
+            };
+            img.onerror = function() {
+                document.getElementById('pixelEncodingResult').innerHTML = `<div class="result warning">⚠️ Failed to load image. Please try a different file.</div>`;
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        function generateImageKeys() {
+            const p = parseInt(document.getElementById('imagePrimeP').value);
+            const q = parseInt(document.getElementById('imagePrimeQ').value);
+            if (!isPrime(p) || !isPrime(q)) {
+                document.getElementById('imageKeyGenerationResult').innerHTML = `<div class="result warning">⚠️ Both p and q must be prime numbers!</div>`;
+                return;
+            }
+            if (p === q) {
+                document.getElementById('imageKeyGenerationResult').innerHTML = `<div class="result warning">⚠️ p and q must be different primes!</div>`;
+                return;
+            }
+            imageState.p = p;
+            imageState.q = q;
+            imageState.n = p * q;
+            imageState.phi = (p - 1) * (q - 1);
+            let e = 3;
+            while (e < imageState.phi && gcd(e, imageState.phi) !== 1) {
+                e += 2;
+            }
+            imageState.e = e;
+            imageState.d = modInverse(e, imageState.phi);
+
+            let resultHTML = '<div class="math-step">';
+            resultHTML += `<strong>Key Generation Steps:</strong><br>`;
+            resultHTML += `1. Choose primes: p = ${p}, q = ${q}<br>`;
+            resultHTML += `2. Calculate n = p × q = ${p} × ${q} = ${imageState.n}<br>`;
+            resultHTML += `3. Calculate φ(n) = (p-1)(q-1) = ${p-1} × ${q-1} = ${imageState.phi}<br>`;
+            resultHTML += `4. Choose e = ${e} (gcd(${e}, ${imageState.phi}) = 1)<br>`;
+            resultHTML += `5. Calculate d ≡ e⁻¹ (mod φ(n)): d = ${imageState.d}<br>`;
+            resultHTML += `6. Verify: e × d = ${e} × ${imageState.d} = ${e * imageState.d} ≡ 1 (mod ${imageState.phi})<br>`;
+            resultHTML += '</div>';
+            resultHTML += `<div class="result success">`;
+            resultHTML += `<strong>🔑 Generated Keys:</strong><br>`;
+            resultHTML += `Public Key: (n=${imageState.n}, e=${imageState.e})<br>`;
+            resultHTML += `Private Key: d=${imageState.d}`;
+            resultHTML += `</div>`;
+            document.getElementById('imageKeyGenerationResult').innerHTML = resultHTML;
+            updateImageProgress(2);
+        }
+
+        function simpleHash(input) {
+            let hash = 0;
+            const str = input.toString();
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0x7fffffff;
+            }
+            return hash % 256;
+        }
+
+        function padImage() {
+            if (imageState.pixelValues.length === 0) {
+                document.getElementById('paddingResult').innerHTML = `<div class="result warning">⚠️ Please process an image first!</div>`;
+                return;
+            }
+            const seed = parseInt(document.getElementById('seedInput').value);
+            if (seed < 0 || seed > 255) {
+                document.getElementById('paddingResult').innerHTML = `<div class="result warning">⚠️ Seed must be between 0 and 255!</div>`;
+                return;
+            }
+            imageState.seed = seed;
+            imageState.paddedValues = [];
+            const resultContainer = document.getElementById('paddingResult');
+            resultContainer.innerHTML = '';
+
+            processBatch(
+                imageState.pixelValues,
+                (i) => {
+                    const M = imageState.pixelValues[i];
+                    if (M >= imageState.n) {
+                        throw new Error(`Pixel value ${M} ≥ n (${imageState.n}). Try larger primes.`);
+                    }
+                    const maskedMsg = M ^ simpleHash(seed);
+                    const maskedSeed = seed ^ simpleHash(maskedMsg);
+                    const paddedValue = (maskedMsg << 8) | maskedSeed;
+                    imageState.paddedValues.push(paddedValue);
+                },
+                resultContainer,
+                () => {
+                    let resultHTML = `<div class="math-step">Simplified OAEP: maskedMsg = M ⊕ G(seed), maskedSeed = seed ⊕ H(maskedMsg), M' = maskedMsg || maskedSeed</div>`;
+                    const displayLimit = Math.min(10, imageState.paddedValues.length);
+                    for (let i = 0; i < displayLimit; i++) {
+                        const M = imageState.pixelValues[i];
+                        const maskedMsg = M ^ simpleHash(seed);
+                        const maskedSeed = seed ^ simpleHash(maskedMsg);
+                        const paddedValue = imageState.paddedValues[i];
+                        resultHTML += `<div class="result">Pixel ${i}: M=${M}, maskedMsg=${maskedMsg}, maskedSeed=${maskedSeed}, M'=${paddedValue}</div>`;
+                    }
+                    if (imageState.paddedValues.length > displayLimit) {
+                        resultHTML += `<div class="result">... Showing first ${displayLimit} of ${imageState.paddedValues.length} pixels</div>`;
+                    }
+                    resultHTML += `<div class="result success">✅ Padded ${imageState.paddedValues.length} pixels</div>`;
+                    document.getElementById('paddingResult').innerHTML = resultHTML;
+                    updateImageProgress(3);
+                }
+            );
+        }
+
+        function encryptImage() {
+            if (imageState.paddedValues.length === 0) {
+                document.getElementById('imageEncryptionResult').innerHTML = `<div class="result warning">⚠️ Please apply padding first!</div>`;
+                return;
+            }
+            if (imageState.n === 0) {
+                document.getElementById('imageEncryptionResult').innerHTML = `<div class="result warning">⚠️ Please generate keys first!</div>`;
+                return;
+            }
+            imageState.ciphertexts = [];
+            const resultContainer = document.getElementById('imageEncryptionResult');
+            resultContainer.innerHTML = '';
+
+            processBatch(
+                imageState.paddedValues,
+                (i) => {
+                    const paddedValue = imageState.paddedValues[i];
+                    const C = modPow(paddedValue, imageState.e, imageState.n);
+                    imageState.ciphertexts.push(Number(C));
+                },
+                resultContainer,
+                () => {
+                    let resultHTML = `<div class="math-step">Encryption: C = (M')^${imageState.e} mod ${imageState.n}</div>`;
+                    const displayLimit = Math.min(10, imageState.ciphertexts.length);
+                    for (let i = 0; i < displayLimit; i++) {
+                        resultHTML += `<div class="result">Pixel ${i}: ${imageState.paddedValues[i]}^${imageState.e} mod ${imageState.n} = ${imageState.ciphertexts[i]}</div>`;
+                    }
+                    if (imageState.ciphertexts.length > displayLimit) {
+                        resultHTML += `<div class="result">... Showing first ${displayLimit} of ${imageState.ciphertexts.length} ciphertexts</div>`;
+                    }
+                    resultHTML += `<div class="result success">🔒 Encrypted ${imageState.ciphertexts.length} pixels</div>`;
+                    document.getElementById('imageEncryptionResult').innerHTML = resultHTML;
+                    updateImageProgress(4);
+                }
+            );
+        }
+
+        function decryptImage() {
+            if (imageState.ciphertexts.length === 0) {
+                document.getElementById('imageDecryptionResult').innerHTML = `<div class="result warning">⚠️ Please encrypt the image first!</div>`;
+                return;
+            }
+            imageState.decryptedPixels = [];
+            const resultContainer = document.getElementById('imageDecryptionResult');
+            resultContainer.innerHTML = '';
+
+            processBatch(
+                imageState.ciphertexts,
+                (i) => {
+                    const C = imageState.ciphertexts[i];
+                    const M_prime = modPow(C, imageState.d, imageState.n);
+                    const maskedMsg = Number(M_prime) >> 8;
+                    const maskedSeed = Number(M_prime) & 0xFF;
+                    const seed = maskedSeed ^ simpleHash(maskedMsg);
+                    const M = maskedMsg ^ simpleHash(seed);
+                    const r = Math.floor(M / 65536);
+                    const g = Math.floor(M / 256) % 256;
+                    const b = M % 256;
+                    imageState.decryptedPixels.push([r, g, b]);
+                },
+                resultContainer,
+                () => {
+                    let resultHTML = `<div class="math-step">Decryption: M' = C^${imageState.d} mod ${imageState.n}, then unpad to recover M</div>`;
+                    const displayLimit = Math.min(10, imageState.decryptedPixels.length);
+                    for (let i = 0; i < displayLimit; i++) {
+                        const [r, g, b] = imageState.decryptedPixels[i];
+                        resultHTML += `<div class="result">Pixel ${i}: R=${r}, G=${g}, B=${b}</div>`;
+                    }
+                    if (imageState.decryptedPixels.length > displayLimit) {
+                        resultHTML += `<div class="result">... Showing first ${displayLimit} of ${imageState.decryptedPixels.length} pixels</div>`;
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = imageState.width;
+                    canvas.height = imageState.height;
+                    canvas.style.width = Math.min(imageState.width, 100) + 'px';
+                    canvas.style.height = Math.min(imageState.height, 100) + 'px';
+                    const ctx = canvas.getContext('2d');
+                    const imageData = ctx.createImageData(imageState.width, imageState.height);
+                    for (let i = 0; i < imageState.decryptedPixels.length; i++) {
+                        const idx = i * 4;
+                        imageData.data[idx] = imageState.decryptedPixels[i][0];
+                        imageData.data[idx + 1] = imageState.decryptedPixels[i][1];
+                        imageData.data[idx + 2] = imageState.decryptedPixels[i][2];
+                        imageData.data[idx + 3] = 255;
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                    const display = document.getElementById('decryptedImageDisplay');
+                    display.innerHTML = '<span class="canvas-label">Decrypted Image:</span>';
+                    display.appendChild(canvas);
+
+                    let isIdentical = true;
+                    for (let i = 0; i < imageState.pixels.length; i++) {
+                        const [r1, g1, b1] = imageState.pixels[i];
+                        const [r2, g2, b2] = imageState.decryptedPixels[i];
+                        if (r1 !== r2 || g1 !== g2 || b1 !== b2) {
+                            isIdentical = false;
+                            break;
+                        }
+                    }
+                    resultHTML += `<div class="result success">🔓 Decrypted ${imageState.decryptedPixels.length} pixels. Image is ${isIdentical ? 'identical' : 'not identical'} to original.</div>`;
+                    document.getElementById('imageDecryptionResult').innerHTML = resultHTML;
+                    updateImageProgress(5);
+                }
+            );
+        }
+    </script>
+</body>
+</html>
