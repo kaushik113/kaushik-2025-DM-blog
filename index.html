@@ -93,7 +93,8 @@
         }
         input[type="text"]:focus, input[type="number"]:focus, input[type="file"]:focus { 
             outline: none; 
-            border-color: #2dd4bf; 
+            border bë
+            color: #2dd4bf; 
             box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2); 
         }
         button { 
@@ -243,43 +244,80 @@
         <section id="text-encryption" class="my-12 card">
             <h2>Text Encryption with RSA</h2>
             <p class="mt-4 text-gray-700 leading-relaxed">
-                Text encryption converts readable messages into secure ciphertext. RSA, a cornerstone of public-key cryptography, leverages number theory to achieve robust security.
+                Text encryption converts readable messages into secure ciphertext, protecting sensitive information like emails, passwords, or financial transactions. RSA, a cornerstone of public-key cryptography, leverages number theory to achieve robust security, widely used in secure communication protocols like HTTPS and SSH.
             </p>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">From Text to Numbers</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                Each character is mapped to an integer using ASCII (e.g., ‘A’ → 65, ‘a’ → 97, space → 32). To handle multiple characters, we group them into a single integer using base-256 encoding:
+                Each character in a message is mapped to an integer using ASCII encoding (e.g., ‘A’ → 65, ‘a’ → 97, space → 32). To handle multiple characters efficiently, we group them into a single integer using base-256 encoding, treating each character as a "digit" in a base-256 number system:
                 \[
                 M = c_1 \cdot 256^{k-1} + c_2 \cdot 256^{k-2} + \dots + c_k \cdot 256^0
                 \]
-                where \( c_i \) is the ASCII code of the \( i \)-th character, and \( M < n \), the RSA modulus.
+                where \( c_i \) is the ASCII code of the \( i \)-th character, and \( k \) is the block size, ensuring the resulting message \( M \) is less than the RSA modulus \( n \). This encoding is reversible, allowing perfect recovery of the original text.
             </p>
+            <div class="math-step">
+                <strong>Why Base-256?</strong> Each character’s ASCII value fits within a byte (8 bits, 0–255), making base-256 a natural choice for compact and efficient encoding.
+            </div>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">RSA Mechanics</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                RSA relies on modular arithmetic. Key generation involves:
+                RSA relies on the mathematical difficulty of factoring large numbers. The algorithm involves:
             </p>
             <ol class="list-decimal ml-6 mt-2 text-gray-700">
-                <li>Choose two large primes \( p \) and \( q \).</li>
-                <li>Compute \( n = p \cdot q \) and Euler’s totient \( \varphi(n) = (p-1)(q-1) \).</li>
-                <li>Select a public exponent \( e \) where \( 1 < e < \varphi(n) \) and \( \gcd(e, \varphi(n)) = 1 \).</li>
-                <li>Compute the private key \( d \) such that \( e \cdot d \equiv 1 \pmod{\varphi(n)} \).</li>
+                <li>Choose two large prime numbers \( p \) and \( q \), typically hundreds of digits long in practice.</li>
+                <li>Compute the modulus \( n = p \cdot q \), which defines the range of numbers in the system.</li>
+                <li>Calculate Euler’s totient \( \varphi(n) = (p-1)(q-1) \), the count of integers coprime to \( n \).</li>
+                <li>Select a public exponent \( e \), often a small prime like 3 or 65537, where \( 1 < e < \varphi(n) \) and \( \gcd(e, \varphi(n)) = 1 \).</li>
+                <li>Compute the private key \( d \), the modular inverse of \( e \), such that \( e \cdot d \equiv 1 \pmod{\varphi(n)} \), using the extended Euclidean algorithm.</li>
             </ol>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                Encryption transforms the message \( M \) into ciphertext:
+                The public key is the pair \( (n, e) \), used for encryption, while the private key \( d \) is used for decryption. Encryption transforms the message \( M \) into ciphertext:
                 \[
                 C = M^e \mod n
                 \]
-                Decryption recovers the message:
+                Decryption recovers the original message:
                 \[
                 M = C^d \mod n
                 \]
+                These operations use modular exponentiation, computed efficiently via the square-and-multiply algorithm to handle large numbers.
             </p>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">Why It Works</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                Euler’s theorem ensures correctness: if \( \gcd(M, n) = 1 \), then \( M^{\varphi(n)} \equiv 1 \pmod{n} \). Since \( e \cdot d \equiv 1 \pmod{\varphi(n)} \), we have:
+                The security of RSA hinges on Euler’s theorem and the difficulty of factoring \( n \). Euler’s theorem states that for \( \gcd(M, n) = 1 \), \( M^{\varphi(n)} \equiv 1 \pmod{n} \). Since \( e \cdot d \equiv 1 \pmod{\varphi(n)} \), we can write \( ed = 1 + k \varphi(n) \) for some integer \( k \). Thus:
                 \[
                 (M^e)^d = M^{ed} = M^{1 + k \varphi(n)} = M \cdot (M^{\varphi(n)})^k \equiv M \cdot 1^k \equiv M \pmod{n}
                 \]
-                For cases where \( \gcd(M, n) \neq 1 \), the Chinese Remainder Theorem guarantees recovery.
+                This ensures the decrypted message matches the original. For cases where \( \gcd(M, n) \neq 1 \), the Chinese Remainder Theorem (CRT) guarantees correct decryption by solving the system modulo \( p \) and \( q \).
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Enhancing Security with Padding</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Direct RSA encryption is deterministic, meaning the same message always produces the same ciphertext, which can be vulnerable to attacks like chosen-plaintext attacks. To mitigate this, RSA is typically used with padding schemes like Optimal Asymmetric Encryption Padding (OAEP). OAEP adds randomness to the message before encryption:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li>Combine the message \( M \) with a random seed \( r \) using a hash function \( G \): \( \text{maskedMsg} = M \oplus G(r) \).</li>
+                <li>Mask the seed with another hash function \( H \): \( \text{maskedSeed} = r \oplus H(\text{maskedMsg}) \).</li>
+                <li>Concatenate: \( M' = \text{maskedMsg} \,||\, \text{maskedSeed} \).</li>
+                <li>Encrypt \( M' \) as \( C = (M')^e \mod n \).</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                OAEP ensures semantic security, making it computationally infeasible to distinguish ciphertexts without the private key. This is critical for real-world applications like secure email or online banking.
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Practical Considerations</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                In practice, RSA is computationally intensive due to large exponentiations, so it’s often used to encrypt small data, like symmetric keys for AES, in a hybrid encryption system. The security relies on the size of \( p \) and \( q \): modern systems use at least 2048-bit keys to resist factorization attacks, as advances in algorithms like the quadratic sieve or quantum computing could threaten smaller keys. Additionally, side-channel attacks, such as timing attacks, require countermeasures like constant-time exponentiation.
+            </p>
+            <div class="math-step">
+                <strong>Security Note:</strong> The strength of RSA depends on the secrecy of \( d \) and the difficulty of factoring \( n \). Quantum computers, if scalable, could use Shor’s algorithm to factor \( n \) efficiently, prompting research into post-quantum cryptography like lattice-based systems.
+            </div>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Real-World Applications</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                RSA is integral to secure communication protocols. For example:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li><strong>HTTPS:</strong> RSA secures the initial handshake in TLS/SSL, encrypting session keys to protect web traffic.</li>
+                <li><strong>Digital Signatures:</strong> RSA signs messages to verify authenticity, used in software updates and secure emails.</li>
+                <li><strong>Secure Messaging:</strong> Apps like Signal use RSA for key exchange to ensure end-to-end encryption.</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                By combining discrete mathematics with practical implementation, RSA provides a robust framework for securing text-based communication in the digital age.
             </p>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">Try It Yourself: RSA Text Encryption Simulator</h3>
             <div class="interactive-demo">
@@ -312,13 +350,13 @@
                     <div id="keyGenerationResult"></div>
                 </div>
                 <div class="step" id="textStep3">
-                    <h2>Step 3: Block Formation</h2>
+                    <h2>Step 3: Simplified OAEP Padding</h2>
                     <div class="input-group">
-                        <label for="blockSize">Characters per block (k):</label>
-                        <input type="number" id="blockSize" value="2" min="1" max="4" aria-label="Characters per block">
+                        <label for="seedInput">Random Seed (0–255):</label>
+                        <input type="number" id="seedInput" value="42" min="0" max="255" aria-label="Random seed">
                     </div>
-                    <button onclick="textFormBlocks()" aria-label="Form message blocks">Form Blocks</button>
-                    <div id="blockResult"></div>
+                    <button onclick="textPadMessage()" aria-label="Apply padding">Apply Padding</button>
+                    <div id="paddingResult"></div>
                 </div>
                 <div class="step" id="textStep4">
                     <h2>Step 4: Encryption</h2>
@@ -602,6 +640,8 @@ ExtendedGCD(e, φ(n)):
             e: 17,
             d: 0,
             blocks: [],
+            seed: 0,
+            paddedBlocks: [],
             encryptedBlocks: [],
             blockSize: 2
         };
@@ -672,16 +712,24 @@ ExtendedGCD(e, φ(n)):
             textUpdateProgress(2);
         }
 
-        function textFormBlocks() {
+        function textPadMessage() {
             if (textState.charCodes.length === 0) {
-                alert('Please process a message first!');
+                document.getElementById('paddingResult').innerHTML = `<div class="result warning">⚠️ Please process a message first!</div>`;
                 return;
             }
             const k = parseInt(document.getElementById('blockSize').value);
+            const seed = parseInt(document.getElementById('seedInput').value);
+            if (seed < 0 || seed > 255) {
+                document.getElementById('paddingResult').innerHTML = `<div class="result warning">⚠️ Seed must be between 0 and 255!</div>`;
+                return;
+            }
             textState.blockSize = k;
+            textState.seed = seed;
             textState.blocks = [];
-            let resultHTML = '<h3>Block Formation:</h3>';
-            resultHTML += `<div class="math-step">Formula: M = c₁×256^(k-1) + c₂×256^(k-2) + ... + cₖ×256⁰</div>`;
+            textState.paddedBlocks = [];
+            let resultHTML = '<h3>Block Formation and Simplified OAEP Padding:</h3>';
+            resultHTML += `<div class="math-step">Block Formation: M = c₁×256^(k-1) + c₂×256^(k-2) + ... + cₖ×256⁰</div>`;
+            resultHTML += `<div class="math-step">Simplified OAEP: maskedMsg = M ⊕ G(seed), maskedSeed = seed ⊕ H(maskedMsg), M' = maskedMsg || maskedSeed</div>`;
             for (let i = 0; i < textState.charCodes.length; i += k) {
                 let blockChars = textState.charCodes.slice(i, i + k);
                 let M = 0n;
@@ -695,32 +743,44 @@ ExtendedGCD(e, φ(n)):
                 }
                 if (M >= BigInt(textState.n)) {
                     resultHTML += `<div class="warning">⚠️ Block ${M} ≥ n (${textState.n}). Try smaller block size or different primes!</div>`;
-                    document.getElementById('blockResult').innerHTML = resultHTML;
+                    document.getElementById('paddingResult').innerHTML = resultHTML;
                     return;
                 }
-                textState.blocks.push(Number(M));
+                const M_num = Number(M);
+                const maskedMsg = M_num ^ simpleHash(seed);
+                const maskedSeed = seed ^ simpleHash(maskedMsg);
+                const paddedValue = (maskedMsg << 8) | maskedSeed;
+                if (paddedValue >= textState.n) {
+                    resultHTML += `<div class="warning">⚠️ Padded value ${paddedValue} ≥ n (${textState.n}). Try larger primes!</div>`;
+                    document.getElementById('paddingResult').innerHTML = resultHTML;
+                    return;
+                }
+                textState.blocks.push(M_num);
+                textState.paddedBlocks.push(paddedValue);
                 resultHTML += `<div class="result">`;
                 resultHTML += `Block ${Math.floor(i/k) + 1}: [${blockChars.join(', ')}] → ${calculation} = ${M}<br>`;
+                resultHTML += `Padding: M=${M_num}, maskedMsg=${maskedMsg}, maskedSeed=${maskedSeed}, M'=${paddedValue}<br>`;
                 resultHTML += `</div>`;
             }
-            document.getElementById('blockResult').innerHTML = resultHTML;
+            resultHTML += `<div class="result success">✅ Formed and padded ${textState.paddedBlocks.length} blocks</div>`;
+            document.getElementById('paddingResult').innerHTML = resultHTML;
             textUpdateProgress(3);
         }
 
         function textEncryptMessage() {
-            if (textState.blocks.length === 0) {
-                alert('Please form blocks first!');
+            if (textState.paddedBlocks.length === 0) {
+                document.getElementById('encryptionResult').innerHTML = `<div class="result warning">⚠️ Please apply padding first!</div>`;
                 return;
             }
             textState.encryptedBlocks = [];
             let resultHTML = '<h3>Encrypting Each Block:</h3>';
-            resultHTML += `<div class="math-step">Encryption: C = M^e mod n = M^${textState.e} mod ${textState.n}</div>`;
-            for (let i = 0; i < textState.blocks.length; i++) {
-                const M = textState.blocks[i];
-                const C = modPow(M, textState.e, textState.n);
+            resultHTML += `<div class="math-step">Encryption: C = (M')^${textState.e} mod ${textState.n}</div>`;
+            for (let i = 0; i < textState.paddedBlocks.length; i++) {
+                const M_prime = textState.paddedBlocks[i];
+                const C = modPow(M_prime, textState.e, textState.n);
                 textState.encryptedBlocks.push(Number(C));
                 resultHTML += `<div class="result">`;
-                resultHTML += `Block ${i + 1}: ${M}^${textState.e} mod ${textState.n} = ${C}<br>`;
+                resultHTML += `Block ${i + 1}: ${M_prime}^${textState.e} mod ${textState.n} = ${C}<br>`;
                 resultHTML += `</div>`;
             }
             resultHTML += `<div class="result success">`;
@@ -737,14 +797,19 @@ ExtendedGCD(e, φ(n)):
                 return;
             }
             let resultHTML = '<h3>Decrypting Each Block:</h3>';
-            resultHTML += `<div class="math-step">Decryption: M = C^d mod n = C^${textState.d} mod ${textState.n}</div>`;
+            resultHTML += `<div class="math-step">Decryption: M' = C^${textState.d} mod ${textState.n}, then unpad to recover M</div>`;
             let decryptedBlocks = [];
             for (let i = 0; i < textState.encryptedBlocks.length; i++) {
                 const C = textState.encryptedBlocks[i];
-                const M = modPow(C, textState.d, textState.n);
-                decryptedBlocks.push(Number(M));
+                const M_prime = modPow(C, textState.d, textState.n);
+                const maskedMsg = Number(M_prime) >> 8;
+                const maskedSeed = Number(M_prime) & 0xFF;
+                const seed = maskedSeed ^ simpleHash(maskedMsg);
+                const M = maskedMsg ^ simpleHash(seed);
+                decryptedBlocks.push(M);
                 resultHTML += `<div class="result">`;
-                resultHTML += `Block ${i + 1}: ${C}^${textState.d} mod ${textState.n} = ${M}<br>`;
+                resultHTML += `Block ${i + 1}: ${C}^${textState.d} mod ${textState.n} = ${M_prime}<br>`;
+                resultHTML += `Unpadding: maskedMsg=${maskedMsg}, maskedSeed=${maskedSeed}, seed=${seed}, M=${M}<br>`;
                 resultHTML += `</div>`;
             }
             let decryptedText = '';
