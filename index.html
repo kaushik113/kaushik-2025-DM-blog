@@ -93,8 +93,7 @@
         }
         input[type="text"]:focus, input[type="number"]:focus, input[type="file"]:focus { 
             outline: none; 
-            border bë
-            color: #2dd4bf; 
+            border-color: #2dd4bf; 
             box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2); 
         }
         button { 
@@ -375,45 +374,119 @@
         <section id="image-encryption" class="my-12 card">
             <h2>Image Encryption with RSA</h2>
             <p class="mt-4 text-gray-700 leading-relaxed">
-                Imagine sending a top-secret satellite image or a drone reconnaissance photo across the internet. RSA encryption transforms colorful pixels into unreadable ciphertext using prime numbers, modular arithmetic, and number theory.
+                Image encryption is vital for securing visual data, such as satellite imagery, medical scans, or personal photos transmitted over networks. RSA, with its foundation in number theory, transforms pixel data into unreadable ciphertext, ensuring confidentiality for sensitive applications like military reconnaissance or telemedicine.
             </p>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">Turning Pixels into Numbers</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                A color image is a grid of pixels, each with RGB values from 0 to 255:
+                An image is a grid of pixels, where each pixel is defined by its RGB (Red, Green, Blue) values, each ranging from 0 to 255:
                 \[
                 R_{i,j}, G_{i,j}, B_{i,j} \in \{0, 1, \dots, 255\}
                 \]
-                We pack RGB values into a single number:
+                To encrypt with RSA, we combine the RGB values of a pixel into a single integer using base-256 encoding:
                 \[
                 M = R \cdot 256^2 + G \cdot 256 + B
                 \]
-                For example, a pixel (100, 150, 200) becomes:
+                For example, a pixel with RGB values (100, 150, 200) is encoded as:
                 \[
                 M = 100 \cdot 65536 + 150 \cdot 256 + 200 = 6,592,200
                 \]
-                We ensure \( M < n \), the RSA modulus.
+                The resulting \( M \) must be less than the RSA modulus \( n \) to ensure correct encryption and decryption. This encoding is reversible, allowing the original RGB values to be recovered.
             </p>
-            <h3 class="text-2xl font-medium mt-6 text-blue-800">Setting Up RSA</h3>
+            <div class="math-step">
+                <strong>Why Base-256?</strong> Each RGB component fits within a byte (8 bits), making base-256 encoding efficient for packing pixel data into a single number suitable for RSA.
+            </div>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">RSA Mechanics for Images</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                RSA key generation follows the same steps as text encryption, using two primes \( p \) and \( q \).
+                RSA key generation for image encryption follows the same process as for text:
             </p>
-            <h3 class="text-2xl font-medium mt-6 text-blue-800">Adding Randomness with OAEP Padding</h3>
+            <ol class="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Select two large primes \( p \) and \( q \), often much larger for images due to higher data volume.</li>
+                <li>Compute \( n = p \cdot q \) and \( \varphi(n) = (p-1)(q-1) \).</li>
+                <li>Choose a public exponent \( e \) such that \( 1 < e < \varphi(n) \) and \( \gcd(e, \varphi(n)) = 1 \).</li>
+                <li>Compute the private key \( d \) where \( e \cdot d \equiv 1 \pmod{\varphi(n)} \).</li>
+            </ol>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                OAEP padding adds randomness:
-                <ul class="list-disc ml-6 mt-2 text-gray-700">
-                    <li>Mask message: \( \text{maskedMsg} = M \oplus G(r) \).</li>
-                    <li>Mask seed: \( \text{maskedSeed} = r \oplus H(\text{maskedMsg}) \).</li>
-                    <li>Combine: \( M' = \text{maskedMsg} \,||\, \text{maskedSeed} \).</li>
-                </ul>
+                Each pixel’s encoded value \( M \) is encrypted:
+                \[
+                C = M^e \mod n
+                \]
+                Decryption recovers \( M \):
+                \[
+                M = C^d \mod n
+                \]
+                The recovered \( M \) is then decoded back into RGB values by reversing the base-256 encoding.
             </p>
-            <h3 class="text-2xl font-medium mt-6 text-blue-800">Encrypting and Decrypting</h3>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Enhancing Security with OAEP Padding</h3>
             <p class="mt-2 text-gray-700 leading-relaxed">
-                Encrypt: \( C = (M')^e \mod n \)<br>
-                Decrypt: \( M' = C^d \mod n \), then unpad to recover \( M \).
+                Direct RSA encryption of pixel values is deterministic, making it vulnerable to attacks like pattern analysis, especially in images with repetitive structures (e.g., a blue sky). Optimal Asymmetric Encryption Padding (OAEP) introduces randomness to mitigate this:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li>Generate a random seed \( r \).</li>
+                <li>Mask the message: \( \text{maskedMsg} = M \oplus G(r) \), where \( G \) is a hash function.</li>
+                <li>Mask the seed: \( \text{maskedSeed} = r \oplus H(\text{maskedMsg}) \), where \( H \) is another hash function.</li>
+                <li>Combine: \( M' = \text{maskedMsg} \,||\, \text{maskedSeed} \).</li>
+                <li>Encrypt: \( C = (M')^e \mod n \).</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                During decryption, \( M' \) is recovered with \( M' = C^d \mod n \), and the padding is reversed to retrieve \( M \). OAEP ensures semantic security, making it computationally infeasible to deduce the original pixel values without the private key.
+            </p>
+            <div class="math-step">
+                <strong>Why Padding Matters:</strong> In images, identical pixel values (e.g., in uniform areas) produce identical ciphertexts without padding, leaking structural information. OAEP randomizes each encryption, enhancing security.
+            </div>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Challenges in Image Encryption</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Encrypting images with RSA presents unique challenges due to the large volume of data:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li><strong>Computational Overhead:</strong> Each pixel requires modular exponentiation, which is computationally intensive. For a 1920x1080 image, that’s over 2 million pixels, necessitating efficient algorithms or larger primes.</li>
+                <li><strong>Key Size:</strong> The modulus \( n \) must be larger than the maximum pixel value (e.g., 256^3 = 16,777,216 for RGB). In practice, 2048-bit or larger keys are used to accommodate padding and ensure security.</li>
+                <li><strong>Data Correlation:</strong> Images often have spatial correlations (e.g., adjacent pixels with similar colors). Encryption must disrupt these patterns to prevent attacks like statistical analysis.</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                To address these, RSA is often used in a hybrid system, encrypting a symmetric key (e.g., for AES) that then encrypts the image data more efficiently.
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Real-World Applications</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Image encryption is critical in various domains:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li><strong>Military and Surveillance:</strong> Encrypting satellite or drone imagery prevents adversaries from intercepting strategic data.</li>
+                <li><strong>Medical Imaging:</strong> Protecting patient data in X-rays, MRIs, or telemedicine ensures compliance with regulations like HIPAA.</li>
+                <li><strong>Digital Media:</strong> Securing copyrighted images or sensitive photographs during transmission over cloud services.</li>
+                <li><strong>Biometric Security:</strong> Encrypting facial recognition or fingerprint images to prevent unauthorized access.</li>
+            </ul>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                For example, in telemedicine, a doctor might transmit an encrypted MRI scan to a specialist. RSA ensures the data remains confidential, even over unsecured networks.
+            </p>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Security Considerations</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                RSA’s security for images relies on the same principles as for text, but additional factors apply:
+            </p>
+            <ul class="list-disc ml-6 mt-2 text-gray-700">
+                <li><strong>Large Primes:</strong> Images require larger \( p \) and \( q \) to handle higher numerical values and padding overhead, increasing computational cost but enhancing security.</li>
+                <li><strong>Side-Channel Attacks:</strong> Timing or power analysis attacks can exploit pixel processing patterns, requiring countermeasures like randomized padding or constant-time operations.</li>
+                <li><strong>Post-Quantum Threats:</strong> Quantum algorithms like Shor’s could factor \( n \), necessitating exploration of post-quantum alternatives like lattice-based cryptography for future-proofing.</li>
+            </ul>
+            <div class="math-step">
+                <strong>Performance Tip:</strong> The Chinese Remainder Theorem (CRT) can optimize decryption by computing \( M_p = C^{d_p} \pmod{p} \) and \( M_q = C^{d_q} \pmod{q} \), then combining results, reducing computation time for large images.
+            </div>
+            <h3 class="text-2xl font-medium mt-6 text-blue-800">Hybrid Encryption for Images</h3>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                Due to RSA’s computational intensity, hybrid encryption is common for images. RSA encrypts a symmetric key (e.g., a 256-bit AES key), which then encrypts the pixel data:
+            </p>
+            <ol class="list-decimal ml-6 mt-2 text-gray-700">
+                <li>Generate a random AES key \( K \).</li>
+                <li>Use RSA to encrypt \( K \): \( C_K = K^e \mod n \).</li>
+                <li>Encrypt pixel data with AES using \( K \), leveraging AES’s efficiency in \( \mathbb{F}_{2^8} \).</li>
+                <li>Transmit \( C_K \) and the AES-encrypted image.</li>
+                <li>The receiver decrypts \( K \) with RSA, then uses \( K \) to decrypt the image with AES.</li>
+            </ol>
+            <p class="mt-2 text-gray-700 leading-relaxed">
+                This approach combines RSA’s secure key exchange with AES’s fast bulk encryption, ideal for large images.
             </p>
             <h3 class="text-2xl font-medium mt-6 text-blue-800">Try It Yourself: RSA Image Encryption Simulator</h3>
             <div class="interactive-demo">
-                <p class="text-gray-700 leading-relaxed">Upload an image (PNG/JPEG) to encrypt and decrypt its pixels using RSA. Use default primes p=65537, q=65539 for larger images. <strong>Note: Large images may take a long time to process.</strong></p>
+                <p class="text-gray-700 leading-relaxed">Upload an image (PNG/JPEG) to encrypt and decrypt its pixels using RSA. Use default primes p=65537, q=65539 for larger images. <strong>Note: Large images may take a long time to process due to RSA’s computational intensity.</strong></p>
                 <div class="progress-bar">
                     <div class="progress-fill" id="imageProgressFill"></div>
                 </div>
